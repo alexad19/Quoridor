@@ -1,5 +1,0 @@
-# depslib dependency file v1.0
-1483545812 source:c:\users\alexa\onedrive\documents\facultate\quoridor\quoridor\main.cpp
-	<iostream>
-	<SFML/Graphics.hpp>
-
