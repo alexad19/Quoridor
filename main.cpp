@@ -1,29 +1,7 @@
-#include <iostream>
+#include "proiect.h"
 #include <SFML/Graphics.hpp>
+
 using namespace std;
-
-int NumberOfPlayers=2;
-
-struct mut{
-    int fel, lin, col;
-};
-
-struct walls
-{
-    int lin, col, poz;
-};
-
-struct casuta
-{
-    int lin, col;
-};
-
-struct players
-{
-    casuta pozitie;
-    int nrWalls=20/NumberOfPlayers;
-};
-
 
 int nrPereti;
 casuta  d[5];
@@ -31,19 +9,6 @@ walls perete, pereti[100];
 players player[10];
 sf::RenderWindow window(sf::VideoMode(800, 800), "Quoridor");
 int Map[20][20], Vali[20][20];
-
-
-
-void meniu();
-void selectPlayerMode();
-void initializare();
-bool pause();
-void play();
-void singlePlay ();
-void help();
-int lee(int indPlayer);
-int gata (int indPlayer);
-bool winner (int indPlayer);
 
 int main()
 {
@@ -75,8 +40,6 @@ void meniu ()
                     if( (29<=eveniment.mouseButton.x && eveniment.mouseButton.x<=140) && (334<=eveniment.mouseButton.y && eveniment.mouseButton.y<=402) )
                     {
                         //play
-
-                        cout<<"N-ai ce juca!\n";
                         initializare();
                         selectPlayerMode();
                     }
@@ -84,7 +47,6 @@ void meniu ()
                     {
                         //help
                         help();
-                        cout<<"Esti neajutorat\n";
                     }
                     else if( (29<=eveniment.mouseButton.x && eveniment.mouseButton.x<=135) && (570<=eveniment.mouseButton.y && eveniment.mouseButton.y<=620) )
                     {
@@ -125,13 +87,26 @@ void selectPlayerMode()
                     {
                         //singlePlay
                         NumberOfPlayers=2;
+                        for(int i=1; i<=4; ++i)
+                            player[i].nrWalls=20/NumberOfPlayers;
                         singlePlay();
                         return;
                     }
-                    else if( (290<=eveniment.mouseButton.x && eveniment.mouseButton.x<=500) && (350<=eveniment.mouseButton.y && eveniment.mouseButton.y<=582) )
+                    else if( (265<=eveniment.mouseButton.x && eveniment.mouseButton.x<=515) && (455<=eveniment.mouseButton.y && eveniment.mouseButton.y<=515) )
                     {
                         //back to meniu
                         NumberOfPlayers=2;
+                        for(int i=1; i<=4; ++i)
+                            player[i].nrWalls=20/NumberOfPlayers;
+                        play();
+                        return;
+                    }
+                    else if( (290<=eveniment.mouseButton.x && eveniment.mouseButton.x<=500) && (544<=eveniment.mouseButton.y && eveniment.mouseButton.y<=582) )
+                    {
+                        //back to meniu
+                        NumberOfPlayers=2;
+                        for(int i=1; i<=4; ++i)
+                            player[i].nrWalls=20/NumberOfPlayers;
                         play();
                         return;
                     }
@@ -139,6 +114,8 @@ void selectPlayerMode()
                     {
                         //back to meniu
                         NumberOfPlayers=4;
+                        for(int i=1; i<=4; ++i)
+                            player[i].nrWalls=20/NumberOfPlayers;
                         play();
                         return;
                     }
@@ -280,7 +257,6 @@ void play ()
             {
 
 
-                    cout<<"Am apasat\n";
                     if(eveniment.mouseButton.button==sf::Mouse::Left)
                     {
                         actualX=eveniment.mouseButton.x;
@@ -300,11 +276,10 @@ void play ()
                                 Map[2*player[turn].pozitie.lin-1][2*player[turn].pozitie.col-1]=0;
                                 player[turn].pozitie=next;
                                 Map[2*player[turn].pozitie.lin-1][2*player[turn].pozitie.col-1]=1;
-                                cout<<"Am modificat\n";
                                 if( winner(turn) )
                                 {
                                     //avem un castigator
-                                    cout<<"CASTIGATOR "<<turn<<"-> "<<player[turn].pozitie.lin<<' '<<player[turn].pozitie.col <<'\n';
+                                    whoWonMP(turn);
                                     return;
                                 }
                                 ++turn;
@@ -312,7 +287,7 @@ void play ()
                                 break;
 
                             }
-                            else if(
+                            else if( !Map[2*(next.lin+d[i].lin) -1 ] [ 2*(next.col+d[i].col) -1 ] && !Map[2*next.lin-1+d[i].lin][2*next.col-1+d[i].col] &&
                                 Map[2*next.lin-1][2*next.col-1] && !Map[2*player[turn].pozitie.lin-1+d[i].lin][2*player[turn].pozitie.col-1+d[i].col] &&
                                (0<next.lin && next.lin<=9) && (0<next.col && next.col<=9) &&
                                 ( next.lin-1)*79 +51 <=actualY && actualY<=(next.lin-1)*79 +102
@@ -323,10 +298,33 @@ void play ()
                                     Map[2*player[turn].pozitie.lin-1][2*player[turn].pozitie.col-1]=0;
                                     player[turn].pozitie=next;
                                     Map[2*player[turn].pozitie.lin-1][2*player[turn].pozitie.col-1]=1;
-                                    cout<<"Am modificat\n";
                                     if( winner(turn) )
                                     {
                                         //avem un castigator
+                                        whoWonMP(turn);
+                                        return;
+                                    }
+
+                                    ++turn;
+                                    if(turn==NumberOfPlayers+1) turn=1;
+                                    break;
+                               }
+                               else if( Map[2*next.lin-1+d[i].lin][2*next.col-1+d[i].col] && !Map[2*next.lin-1 -d[i].col ][2*next.col-1 +d[i].lin ] &&
+                                Map[2*next.lin-1][2*next.col-1] && !Map[2*player[turn].pozitie.lin-1+d[i].lin][2*player[turn].pozitie.col-1+d[i].col] &&
+                               (0<next.lin && next.lin<=9) && (0<next.col && next.col<=9) &&
+                                ( next.lin-1)*79 +51 <=actualY && actualY<=(next.lin-1)*79 +102
+                               && ( (next.col-1)*79 +51<=actualX && actualX<=(next.col-1)*79 +102  ) )
+                               {
+                                    next.lin=next.lin-d[i].col;
+                                    next.col=next.col-d[i].lin;
+                                    Map[2*player[turn].pozitie.lin-1][2*player[turn].pozitie.col-1]=0;
+                                    player[turn].pozitie=next;
+                                    Map[2*player[turn].pozitie.lin-1][2*player[turn].pozitie.col-1]=1;
+
+                                    if( winner(turn) )
+                                    {
+                                        //avem un castigator
+                                        whoWonMP(turn);
                                         return;
                                     }
 
@@ -358,7 +356,6 @@ void play ()
 
                             for(i=1; i<=NumberOfPlayers; ++i)
                             {
-                                cout<<i<<' '<<lee(i) <<'\n';
                                 if(!lee(i)) break;
                             }
                             if(i==NumberOfPlayers+1)
@@ -375,17 +372,6 @@ void play ()
                                 Map[ 2*( (pereti[nrPereti].lin-118)/79 +1 ) ][ ( 2*(pereti[nrPereti].col-51)/79 )+3 ]=0;
                                 --nrPereti;
                             }
-
-//                            for(int x=1; x<=18; ++x)
-//                            {
-//                                for(int y=1; y<=18; ++y)
-//                                    cout<<Map[x][y]<<' ';
-//
-//                                cout<<'\n';
-//                            }
-//                            cout<<2*( (pereti[nrPereti].lin-118)/79 +1 )<<' '<<2*( (pereti[nrPereti].col-51)/79  )+1<<'\n';
-//                            cout<<2*( (pereti[nrPereti].lin-118)/79 +1 )<<' '<<2*( (pereti[nrPereti].col-51)/79 )+2<<'\n';
-//                            cout<<2*( (pereti[nrPereti].lin-118)/79 +1 )<<' '<<( 2*(pereti[nrPereti].col-51)/79 )+3<<'\n';
 
 
                         }
@@ -410,7 +396,6 @@ void play ()
 
                             for(i=1; i<=NumberOfPlayers; ++i)
                             {
-                                cout<<i<<' '<<lee(i)<<'\n';
                                 if(!lee(i)) break;
                             }
 
@@ -428,35 +413,9 @@ void play ()
                                 Map[  2* ( (pereti[nrPereti].lin-51)/79 +1) +1 ][ 2*( (pereti[nrPereti].col-118)/79 +1) ]=0;
                                 --nrPereti;
                             }
-//
-//                            for(int x=1; x<=18; ++x)
-//                            {
-//                                for(int y=1; y<=18; ++y)
-//                                    cout<<Map[x][y]<<' ';
-//
-//                                cout<<'\n';
-//                            }
-//
-//
-//                            cout<<2* ( (pereti[nrPereti].lin-51)/79 +1) -1 <<' '<< 2*( (pereti[nrPereti].col-118)/79 +1)<<'\n';
-//                            cout<<2* ( (pereti[nrPereti].lin-51)/79 +1) <<' '<< 2*( (pereti[nrPereti].col-118)/79 +1)<<'\n';
-//                            cout<<2* ( (pereti[nrPereti].lin-51)/79 +1) +1 <<' '<< 2*( (pereti[nrPereti].col-118)/79 +1)<<'\n';
                         }
-
-                    }
-
-
-                for(int x=1; x<=18; ++x)
-                {
-                    for(int y=1; y<=18; ++y)
-                        cout<<Map[x][y]<<' ';
-
-                    cout<<'\n';
-                }
-
-                cout<<'\n';
-
             }
+
             else if (eveniment.type == sf::Event::KeyPressed)
             {
                 if (eveniment.key.code == sf::Keyboard::Escape)
@@ -467,6 +426,8 @@ void play ()
                 }
             }
         }
+
+    }
 
 
 
@@ -539,8 +500,78 @@ void play ()
         }
 
         window.display();
+    }
 
 
+}
+
+
+void whoWonMP (int indPlayer)
+{
+    char sir[]={"p0.png"};
+    sf::Event eveniment;
+    sf::Texture textura;
+
+
+    while (window.isOpen() )
+    {
+
+        while(window.pollEvent(eveniment) )
+        {
+            if(eveniment.type==sf::Event::EventType::Closed)
+                window.close();
+            else if(eveniment.type == sf::Event::MouseButtonPressed)
+            {
+
+                if(eveniment.mouseButton.button==sf::Mouse::Left)
+                {
+                    return;
+                }
+            }
+        }
+
+        sir[1]=indPlayer+'0';
+        textura.loadFromFile(sir);
+        sf::Sprite castigator(textura);
+
+        window.clear();
+        window.draw(castigator);
+        window.display();
+    }
+}
+
+
+void whoWonSP (int indPlayer)
+{
+    char sir[]={"you0.png"};
+    sf::Event eveniment;
+    sf::Texture textura;
+
+
+    while (window.isOpen() )
+    {
+
+        while(window.pollEvent(eveniment) )
+        {
+            if(eveniment.type==sf::Event::EventType::Closed)
+                window.close();
+            else if(eveniment.type == sf::Event::MouseButtonPressed)
+            {
+
+                if(eveniment.mouseButton.button==sf::Mouse::Left)
+                {
+                    return;
+                }
+            }
+        }
+
+        sir[3]=indPlayer+'0';
+        textura.loadFromFile(sir);
+        sf::Sprite castigator(textura);
+
+        window.clear();
+        window.draw(castigator);
+        window.display();
     }
 }
 
@@ -550,6 +581,7 @@ void singlePlay ()
 {
     int i, j, turn=1, actualX, actualY, mini;
     char numeImagine[]={"pawn0.png"}, rand[]={"cerc0.png"}, numePerete[]={"perete0.png"};
+    float sec;
     mut mutare;
     casuta next, aux;
     d[0].lin=-1; d[1].lin=0; d[2].lin=1; d[3].lin=0;
@@ -559,6 +591,8 @@ void singlePlay ()
     sf::Texture textura, texturaPawn, texturaTurn, texturaWall;
     textura.loadFromFile("tabla1.png");
     sf::Sprite board(textura);
+    sf::Time time;
+    sf::Clock clock;
 
     player[1].pozitie.lin=9; player[1].pozitie.col=5; Map[2*player[1].pozitie.lin-1][2*player[1].pozitie.col-1]=1;
     player[2].pozitie.lin=1; player[2].pozitie.col=5; Map[2*player[2].pozitie.lin-1][2*player[2].pozitie.col-1]=1;
@@ -574,7 +608,7 @@ void singlePlay ()
             {
 
 
-                    cout<<"Am apasat\n";
+
                     if(eveniment.mouseButton.button==sf::Mouse::Left)
                     {
                         actualX=eveniment.mouseButton.x;
@@ -594,14 +628,17 @@ void singlePlay ()
                                 Map[2*player[turn].pozitie.lin-1][2*player[turn].pozitie.col-1]=0;
                                 player[turn].pozitie=next;
                                 Map[2*player[turn].pozitie.lin-1][2*player[turn].pozitie.col-1]=1;
-                                cout<<"Am modificat\n";
                                 if( winner(turn) )
                                 {
                                     //avem un castigator
+                                    whoWonSP(turn);
                                     return;
                                 }
                                 ++turn;
                                 if(turn==NumberOfPlayers+1) turn=1;
+
+                                time=clock.getElapsedTime();
+                                sec=time.asSeconds();
                                 break;
 
                             }
@@ -616,15 +653,43 @@ void singlePlay ()
                                     Map[2*player[turn].pozitie.lin-1][2*player[turn].pozitie.col-1]=0;
                                     player[turn].pozitie=next;
                                     Map[2*player[turn].pozitie.lin-1][2*player[turn].pozitie.col-1]=1;
-                                    cout<<"Am modificat\n";
                                     if( winner(turn) )
                                     {
                                         //avem un castigator
+                                        whoWonSP(turn);
                                         return;
                                     }
 
                                     ++turn;
                                     if(turn==NumberOfPlayers+1) turn=1;
+
+                                    time=clock.getElapsedTime();
+                                    sec=time.asSeconds();
+                                    break;
+                               }
+                            else if( Map[2*next.lin-1+d[i].lin][2*next.col-1+d[i].col] && !Map[2*next.lin-1 -d[i].col ][2*next.col-1 +d[i].lin ] &&
+                                Map[2*next.lin-1][2*next.col-1] && !Map[2*player[turn].pozitie.lin-1+d[i].lin][2*player[turn].pozitie.col-1+d[i].col] &&
+                               (0<next.lin && next.lin<=9) && (0<next.col && next.col<=9) &&
+                                ( next.lin-1)*79 +51 <=actualY && actualY<=(next.lin-1)*79 +102
+                               && ( (next.col-1)*79 +51<=actualX && actualX<=(next.col-1)*79 +102  ) )
+                               {
+                                    next.lin=next.lin-d[i].col;
+                                    next.col=next.col-d[i].lin;
+                                    Map[2*player[turn].pozitie.lin-1][2*player[turn].pozitie.col-1]=0;
+                                    player[turn].pozitie=next;
+                                    Map[2*player[turn].pozitie.lin-1][2*player[turn].pozitie.col-1]=1;
+                                    if( winner(turn) )
+                                    {
+                                        //avem un castigator
+                                        whoWonSP(turn);
+                                        return;
+                                    }
+
+                                    ++turn;
+                                    if(turn==NumberOfPlayers+1) turn=1;
+
+                                    time=sf::seconds(1);
+                                    sec=time.asSeconds();
                                     break;
                                }
                         }
@@ -651,7 +716,7 @@ void singlePlay ()
 
                             for(i=1; i<=NumberOfPlayers; ++i)
                             {
-                                cout<<i<<' '<<lee(i)<<'\n';
+
                                 if(!lee(i)) break;
                             }
                             if(i==NumberOfPlayers+1)
@@ -660,6 +725,8 @@ void singlePlay ()
                                 --player[turn].nrWalls;
                                 ++turn;
                                 if(turn==NumberOfPlayers+1) turn=1;
+                                time=clock.getElapsedTime();
+                                sec=time.asSeconds();
                             }
                             else
                             {
@@ -668,18 +735,6 @@ void singlePlay ()
                                 Map[ 2*( (pereti[nrPereti].lin-118)/79 +1 ) ][ ( 2*(pereti[nrPereti].col-51)/79 )+3 ]=0;
                                 --nrPereti;
                             }
-
-//                            for(int x=1; x<=18; ++x)
-//                            {void singlePlay ()
-//                                for(int y=1; y<=18; ++y)
-//                                    cout<<Map[x][y]<<' ';
-//
-//                                cout<<'\n';
-//                            }
-//                            cout<<2*( (pereti[nrPereti].lin-118)/79 +1 )<<' '<<2*( (pereti[nrPereti].col-51)/79  )+1<<'\n';
-//                            cout<<2*( (pereti[nrPereti].lin-118)/79 +1 )<<' '<<2*( (pereti[nrPereti].col-51)/79 )+2<<'\n';
-//                            cout<<2*( (pereti[nrPereti].lin-118)/79 +1 )<<' '<<( 2*(pereti[nrPereti].col-51)/79 )+3<<'\n';
-
 
                         }
                         else if(     player[turn].nrWalls &&
@@ -703,7 +758,6 @@ void singlePlay ()
 
                             for(i=1; i<=NumberOfPlayers; ++i)
                             {
-                                cout<<i<<' '<<lee(i)<<'\n';
                                 if(!lee(i)) break;
                             }
 
@@ -712,6 +766,8 @@ void singlePlay ()
                                 --player[turn].nrWalls;
                                 ++turn;
                                 if(turn==NumberOfPlayers+1) turn=1;
+                                time=clock.getElapsedTime();
+                                sec=time.asSeconds();
                             }
                             else
                             {
@@ -721,19 +777,7 @@ void singlePlay ()
                                 Map[  2* ( (pereti[nrPereti].lin-51)/79 +1) +1 ][ 2*( (pereti[nrPereti].col-118)/79 +1) ]=0;
                                 --nrPereti;
                             }
-//
-//                            for(int x=1; x<=18; ++x)
-//                            {
-//                                for(int y=1; y<=18; ++y)
-//                                    cout<<Map[x][y]<<' ';
-//
-//                                cout<<'\n';
-//                            }
-//
-//
-//                            cout<<2* ( (pereti[nrPereti].lin-51)/79 +1) -1 <<' '<< 2*( (pereti[nrPereti].col-118)/79 +1)<<'\n';
-//                            cout<<2* ( (pereti[nrPereti].lin-51)/79 +1) <<' '<< 2*( (pereti[nrPereti].col-118)/79 +1)<<'\n';
-//                            cout<<2* ( (pereti[nrPereti].lin-51)/79 +1) +1 <<' '<< 2*( (pereti[nrPereti].col-118)/79 +1)<<'\n';
+
                         }
 
                     }
@@ -753,8 +797,7 @@ void singlePlay ()
 
         }
 
-
-        if(turn==2)
+        if(turn==2 && time.asSeconds()+1<=clock.getElapsedTime().asSeconds())
         {
 
             mini=100;
@@ -772,15 +815,12 @@ void singlePlay ()
                     aux=player[turn].pozitie;
                     player[turn].pozitie=next;
                     Map[2*next.lin-1][2*next.col-1]=1;
-
-                    cout<<next.lin<<" de aci "<< next.col<<"---> "<<lee(2)-lee(1)<<'\n';
                     if(mini > lee(2)-lee(1))
                     {
                         mini=lee(2)-lee(1);
                         mutare.fel=0;
                         mutare.lin=next.lin;
                         mutare.col=next.col;
-                        cout<<2*mutare.lin-1<<' '<<2*mutare.col-1<<'\n';
 
                     }
                     player[turn].pozitie=aux;
@@ -799,15 +839,12 @@ void singlePlay ()
                         Map[2*player[turn].pozitie.lin-1][2*player[turn].pozitie.col-1]=0;
                         //player[turn].pozitie=next;
                         Map[2*next.lin-1][2*next.col-1]=1;
-
-                        cout<<next.lin<<' '<< next.col<<"---> "<<lee(2)-lee(1)<<'\n';
                         if(mini > lee(2)-lee(1))
                         {
                             mini=lee(2)-lee(1);
                             mutare.fel=0;
                             mutare.lin=next.lin;
                             mutare.col=next.col;
-                            cout<<2*mutare.lin-1<<' '<<2*mutare.col-1<<'\n';
 
                         }
 
@@ -828,7 +865,6 @@ void singlePlay ()
                         Map[i][j]=Map[i][j+1]=Map[i][j+2]=1;
                         if( mini > lee(2)-lee(1) && lee(1) && lee(2))
                         {
-                            cout<<"PL\n";
                             mini=lee(2)-lee(1);
                             mutare.fel=1;
                             mutare.lin=i;
@@ -847,7 +883,6 @@ void singlePlay ()
                         Map[j][i]=Map[j+1][i]=Map[j+2][i]=1;
                         if( mini > lee(2)-lee(1) && lee(1) && lee(2))
                         {
-                            cout<<"PL\n";
                             mini=lee(2)-lee(1);
                             mutare.fel=2;
                             mutare.lin=j;
@@ -861,7 +896,6 @@ void singlePlay ()
             //cout<<"MINI: "<<mini<<'\n';
             if(!mutare.fel)
             {
-                cout<<2*mutare.lin-1<<' '<<2*mutare.col-1<<'\n';
                 Map[ 2*player[turn].pozitie.lin-1 ][ 2*player[turn].pozitie.col-1 ]=0;
                 player[turn].pozitie.lin=mutare.lin;
                 player[turn].pozitie.col=mutare.col;
@@ -871,6 +905,7 @@ void singlePlay ()
                 if(winner(turn))
                 {
                     //te-a batut, fraiere
+                    whoWonSP(turn);
                     return;
                 }
 
@@ -909,19 +944,7 @@ void singlePlay ()
                 if(turn==NumberOfPlayers+1) turn=1;
 
             }
-
-            for(int x=1; x<=18; ++x)
-            {
-                for(int y=1; y<=18; ++y)
-                    cout<<Map[x][y]<<' ';
-
-                cout<<'\n';
-            }
-
         }
-
-
-
 
         if (    //lee(1) && lee(2) && lee(3) &&lee(4) &&
                 player[turn].nrWalls &&
@@ -1101,7 +1124,6 @@ bool winner (int indPlayer)
         case 2:
                 {
 
-                  cout<<indPlayer<<'\n';
                   if(player[indPlayer].pozitie.lin==9)
                         return true;
 
