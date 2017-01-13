@@ -1,5 +1,8 @@
 # depslib dependency file v1.0
-1483810056 source:c:\users\alexa\onedrive\documents\facultate\quoridor\quoridor\main.cpp
+1484340188 source:c:\users\alexa\onedrive\documents\facultate\quoridor\quoridor\main.cpp
+	"proiect.h"
 	<iostream>
 	<SFML/Graphics.hpp>
+
+1484339944 c:\users\alexa\onedrive\documents\facultate\quoridor\quoridor\proiect.h
 

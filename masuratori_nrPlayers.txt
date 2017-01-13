@@ -1,0 +1,8 @@
+player 1- p1.png 
+	p2.png
+	p3.png
+	p4.png
+you lost 
+		you2.png
+you won 
+		you1.png
