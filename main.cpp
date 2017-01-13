@@ -35,7 +35,9 @@ int Map[20][20], Vali[20][20];
 
 
 void meniu();
+void selectPlayerMode();
 void initializare();
+bool pause();
 void play();
 void singlePlay ();
 void help();
@@ -76,7 +78,7 @@ void meniu ()
 
                         cout<<"N-ai ce juca!\n";
                         initializare();
-                        singlePlay();
+                        selectPlayerMode();
                     }
                     else if( (29<=eveniment.mouseButton.x && eveniment.mouseButton.x<=160) && (448<=eveniment.mouseButton.y && eveniment.mouseButton.y<=514) )
                     {
@@ -98,6 +100,59 @@ void meniu ()
     }
 }
 
+void selectPlayerMode()
+{
+
+
+    sf::Event eveniment;
+    sf::Texture textura;
+    textura.loadFromFile("nrPlayers.png");
+    sf::Sprite ajutor(textura);
+
+    while (window.isOpen() )
+    {
+
+        while(window.pollEvent(eveniment) )
+        {
+            if(eveniment.type==sf::Event::EventType::Closed)
+                window.close();
+            else if(eveniment.type == sf::Event::MouseButtonPressed)
+            {
+
+                if(eveniment.mouseButton.button==sf::Mouse::Left)
+                {
+                    if( (260<=eveniment.mouseButton.x && eveniment.mouseButton.x<=520) && (360<=eveniment.mouseButton.y && eveniment.mouseButton.y<=420) )
+                    {
+                        //singlePlay
+                        NumberOfPlayers=2;
+                        singlePlay();
+                        return;
+                    }
+                    else if( (290<=eveniment.mouseButton.x && eveniment.mouseButton.x<=500) && (350<=eveniment.mouseButton.y && eveniment.mouseButton.y<=582) )
+                    {
+                        //back to meniu
+                        NumberOfPlayers=2;
+                        play();
+                        return;
+                    }
+                    else if( (290<=eveniment.mouseButton.x && eveniment.mouseButton.x<=500) && (595<=eveniment.mouseButton.y && eveniment.mouseButton.y<=635) )
+                    {
+                        //back to meniu
+                        NumberOfPlayers=4;
+                        play();
+                        return;
+                    }
+                }
+            }
+        }
+
+        window.clear();
+        window.draw(ajutor);
+        window.display();
+    }
+}
+
+
 void help()
 {
     int pag=1;
@@ -118,23 +173,15 @@ void help()
 
                 if(eveniment.mouseButton.button==sf::Mouse::Left)
                 {
-                    if( (30<=eveniment.mouseButton.x && eveniment.mouseButton.x<=140) && (430<=eveniment.mouseButton.y && eveniment.mouseButton.y<=500) )
+                    if( pag==1 && (635<=eveniment.mouseButton.x && eveniment.mouseButton.x<=745) && (685<=eveniment.mouseButton.y && eveniment.mouseButton.y<=770) )
                     {
-                        //play
-
-                        cout<<"N-ai ce juca!\n";
-
+                        //next
+                        pag=2;
                     }
-                    else if( (30<=eveniment.mouseButton.x && eveniment.mouseButton.x<=160) && (555<=eveniment.mouseButton.y && eveniment.mouseButton.y<=625) )
+                    else if( pag==2 && (620<=eveniment.mouseButton.x && eveniment.mouseButton.x<=730) && (695<=eveniment.mouseButton.y && eveniment.mouseButton.y<=780) )
                     {
-                        //help
-                        //help();
-                        cout<<"Esti neajutorat\n";
-                    }
-                    else if( (30<=eveniment.mouseButton.x && eveniment.mouseButton.x<=135) && (685<=eveniment.mouseButton.y && eveniment.mouseButton.y<=740) )
-                    {
-                        //exit
-                        window.close();
+                        //back to meniu
+                        return;
                     }
                 }
             }
@@ -148,6 +195,49 @@ void help()
         window.display();
     }
 }
+
+bool pause()
+{
+
+
+    sf::Event eveniment;
+    sf::Texture textura;
+    textura.loadFromFile("PauseMenu.png");
+    sf::Sprite ajutor(textura);
+
+    while (window.isOpen() )
+    {
+
+        while(window.pollEvent(eveniment) )
+        {
+            if(eveniment.type==sf::Event::EventType::Closed)
+                window.close();
+            else if(eveniment.type == sf::Event::MouseButtonPressed)
+            {
+
+                if(eveniment.mouseButton.button==sf::Mouse::Left)
+                {
+                    if( (285<=eveniment.mouseButton.x && eveniment.mouseButton.x<=505) && (420<=eveniment.mouseButton.y && eveniment.mouseButton.y<=485) )
+                    {
+                        //back to game
+                        return 1;
+                    }
+                    else if( (230<=eveniment.mouseButton.x && eveniment.mouseButton.x<=565) && (520<=eveniment.mouseButton.y && eveniment.mouseButton.y<=580) )
+                    {
+                        //back to menu
+
+                        return 0;
+                    }
+                }
+            }
+        }
+
+        window.clear();
+        window.draw(ajutor);
+        window.display();
+    }
+}
+
 
 void initializare()
 {
@@ -372,7 +462,8 @@ void play ()
                 if (eveniment.key.code == sf::Keyboard::Escape)
                 {
                     //pause();
-                    cout<<"n-ai scapare\n";
+                    if(!pause())
+                        return;
                 }
             }
         }
@@ -654,7 +745,8 @@ void singlePlay ()
                 if (eveniment.key.code == sf::Keyboard::Escape)
                 {
                     //pause();
-                    cout<<"n-ai scapare\n";
+                    if(!pause())
+                        return;
                 }
             }
 
